@@ -46,11 +46,14 @@
                 <mxCell id="training_worker_1" value="Training worker 1" style="shape=step;whiteSpace=wrap;html=1;fixedSize=1;fillColor=#e066cf;strokeColor=#a83d94;fontColor=#ffffff;fontSize=14;fontStyle=1;" vertex="1" parent="1">
                     <mxGeometry x="780" y="120" width="200" height="70" as="geometry"/>
                 </mxCell>
-                <mxCell id="postgresql" value="PostgreSQL" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#ffe6cc;strokeColor=#d79b00;fontColor=#000000;fontSize=13;fontStyle=1;fontBackgroundColor=#ffffff;" vertex="1" parent="1">
+                <mxCell id="postgresql" value="PostgreSQL 17" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#ffe6cc;strokeColor=#d79b00;fontColor=#000000;fontSize=13;fontStyle=1;fontBackgroundColor=#ffffff;" vertex="1" parent="1">
                     <mxGeometry x="270" y="460" width="90" height="90" as="geometry"/>
                 </mxCell>
-                <mxCell id="annotated_db" value="Annotated Database,&#10;Label Studio, etc." style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;fontSize=11;fontStyle=1;fontBackgroundColor=#ffffff;" vertex="1" parent="1">
+                <mxCell id="label_studio" value="Label Studio" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=13;fontStyle=1;fontBackgroundColor=#ffffff;" vertex="1" parent="1">
                     <mxGeometry x="680" y="460" width="90" height="90" as="geometry"/>
+                </mxCell>
+                <mxCell id="annotated_db" value="Annotated DB" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;fontSize=13;fontStyle=1;fontBackgroundColor=#ffffff;" vertex="1" parent="1">
+                    <mxGeometry x="850" y="460" width="90" height="90" as="geometry"/>
                 </mxCell>
                 <mxCell id="e1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;startArrow=classic;startFill=1;endArrow=classic;endFill=1;" edge="1" parent="1" source="end_user" target="inference_channel">
                     <mxGeometry relative="1" as="geometry"/>
@@ -82,13 +85,16 @@
                 <mxCell id="e10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;startArrow=classic;startFill=1;endArrow=classic;endFill=1;" edge="1" parent="1" source="brain_box" target="training_worker_1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="e11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;startArrow=classic;startFill=1;endArrow=classic;endFill=1;" edge="1" parent="1" source="job_worker_1" target="annotated_db">
+                <mxCell id="e11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;startArrow=classic;startFill=1;endArrow=classic;endFill=1;" edge="1" parent="1" source="job_worker_1" target="label_studio">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="e12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;startArrow=classic;startFill=1;endArrow=classic;endFill=1;" edge="1" parent="1" source="training_worker_1" target="annotated_db">
+                <mxCell id="e12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;startArrow=classic;startFill=1;endArrow=classic;endFill=1;" edge="1" parent="1" source="training_worker_1" target="label_studio">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="e13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;dashed=1;startArrow=classic;startFill=1;endArrow=classic;endFill=1;" edge="1" parent="1" source="postgresql" target="annotated_db">
+                <mxCell id="e13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;startArrow=classic;startFill=1;endArrow=classic;endFill=1;" edge="1" parent="1" source="postgresql" target="label_studio">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e14" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;startArrow=classic;startFill=1;endArrow=classic;endFill=1;" edge="1" parent="1" source="label_studio" target="annotated_db">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
             </root>

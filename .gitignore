@@ -2,3 +2,10 @@
 task-graph.md
 architecture.md
 skill-instructions.md
+.env
+.agents/
+
+# Agent documentation files
+task-graph.md
+architecture.md
+skill-instructions.md
