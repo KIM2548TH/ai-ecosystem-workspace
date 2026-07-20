@@ -1,11 +1,14 @@
 .gemini/
-task-graph.md
-architecture.md
-skill-instructions.md
-.env
 .agents/
-
-# Agent documentation files
 task-graph.md
 architecture.md
 skill-instructions.md
+
+.venv/
+.env
+__pycache__/
+*.pyc
+.pytest_cache/
+agent_folder/
+assets/
+*.docx
