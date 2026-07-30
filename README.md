@@ -1,6 +1,6 @@
 # FastAPI AI Ecosystem & React Web Application
 
-An end-to-end modern AI platform combining a high-performance FastAPI backend microservice architecture with a modern React (Vite) frontend web application. The platform provides secure user authentication, object storage integration with MinIO, dataset metadata management with PostgreSQL 17, an append-only machine learning model registry, asynchronous automated training pipelines backed by Redis and ARQ, and structured JSON error logging.
+An end-to-end modern AI platform combining a high-performance FastAPI backend microservice architecture with a modern React (Vite) frontend web application. The platform provides secure user authentication, object storage integration with MinIO, dataset metadata management with PostgreSQL 17, an append-only machine learning model registry, asynchronous automated training pipelines backed by Redis and ARQ, and structured JSON system logging.
 
 ---
 
@@ -58,50 +58,115 @@ npm run dev
 
 ---
 
-## 2. API Specifications & System Architecture Details
+## 2. System Architecture & Component Diagrams
 
-The system specifications and technical features are built upon the architecture defined in `agent_folder/fastapi_ai_ecosystem_slides_detail.md`.
+### 2.1 High-Level Architecture Diagram
 
-### API Endpoints Specification
+The system follows a clean microservices architecture decoupling the React web interface, FastAPI gateway router, database persistence, object storage, and background processing workers.
 
-| Method | Endpoint | Expected Status | Description & Technical Scope |
-| :--- | :--- | :--- | :--- |
-| **POST** | `/api/v1/auth/register` | `201 Created` | User registration with Bcrypt password hashing. |
-| **POST** | `/api/v1/auth/login` | `200 OK` | OAuth2 Password Bearer authentication returning JWT Access Token. |
-| **GET** | `/api/v1/auth/me` | `200 OK` | Fetches authenticated user profile using `Authorization: Bearer <token>`. |
-| **POST** | `/api/v1/datasets/upload` | `201 Created` | Uploads binary raw datasets to MinIO `raw-datasets` bucket and registers metadata in PostgreSQL. |
-| **GET** | `/api/v1/datasets` | `200 OK` | Lists dataset metadata with pagination and sorting. |
-| **POST** | `/api/v1/models/register` | `201 Created` | Registers a new ML model version using the Append-Only Immutability pattern. |
-| **GET** | `/api/v1/models` | `200 OK` | Returns registered model version listings and metrics lineage. |
-| **POST** | `/api/v1/train` | `202 Accepted` | Triggers non-blocking asynchronous automated model training via ARQ & Redis Queue. |
-| **POST** | `/api/v1/predict` | `200 OK` | Model inference engine that retrieves target model weights and computes prediction scores. |
-| **GET** | `/api/v1/health` | `200 OK` | Diagnostic health check monitoring PostgreSQL, MinIO, Redis, and logging status in JSON format. |
+#### Mermaid Diagram
+```mermaid
+graph TD
+    Client["React Web UI\n(Port 5173 / Vite)"] -->|HTTP / REST JSON| Gateway["FastAPI API Gateway\n(Port 8000 / Uvicorn)"]
+    
+    Gateway -->|Auth & Metadata Queries| Postgres[("PostgreSQL 17 DB\n(Port 5432)")]
+    Gateway -->|Raw Data & Model Artifacts| MinIO["MinIO Object Storage\n(Port 9000 / Console 9001)"]
+    Gateway -->|Enqueue Training Tasks| Redis[("Redis Task Broker\n(Port 6379)")]
+    
+    Worker["ARQ Async Worker Process"] -->|Poll Tasks| Redis
+    Worker -->|Fetch Datasets & Write Model Weights| MinIO
+    Worker -->|Update Model Registry Lineage| Postgres
+```
 
-### Detailed Module Explanations
+#### ASCII Block Diagram
+```text
++-------------------------------------------------------------------+
+|                        React Web Frontend                         |
+|                   (Vite Server - Port 5173)                       |
++-------------------------------------------------------------------+
+                                  |
+                                  | HTTP / REST API Requests
+                                  v
++-------------------------------------------------------------------+
+|                       FastAPI API Gateway                         |
+|                   (Uvicorn - Port 8000)                           |
++-------------------------------------------------------------------+
+         |                        |                        |
+         | SQL Metadata           | S3 Protocol            | Enqueue Jobs
+         v                        v                        v
++------------------+     +------------------+     +------------------+
+|  PostgreSQL 17   |     |  MinIO Storage   |     |   Redis Queue    |
+| (Database: 5432) |     |  (Bucket: 9000)  |     |  (Broker: 6379)  |
++------------------+     +------------------+     +------------------+
+                                                           |
+                                                           | Task Consumption
+                                                           v
+                                                  +------------------+
+                                                  | ARQ Async Worker |
+                                                  | (CPU/GPU Engine) |
+                                                  +------------------+
+```
 
-#### Authentication Architecture
-- **JWT HS256 Standard:** Access tokens are signed using HMAC-SHA256 with secret keys configured in `.env`.
-- **Native Bcrypt Hashing:** Passwords are never stored in plain text. Passwords are securely hashed with native `bcrypt` via `passlib.context.CryptContext`.
-- **Dependency Injection:** Endpoints protect routes by declaring `Depends(get_current_user)` to validate Bearer tokens on every incoming request.
+---
 
-#### Object Storage Flow
-- **Dual-Layer Storage Separation:** Decouples binary payloads from metadata records.
-- **MinIO Object Storage:** Stores actual raw dataset files in the dedicated `raw-datasets` bucket and model weights (`.pt`, `.onnx`) in artifact storage.
-- **PostgreSQL Metadata Tracking:** Records file attributes (file name, MinIO object key path, file size in bytes, owner ID, upload timestamp) in PostgreSQL tables.
+### 2.2 System Data Flow & Sequence Diagram
 
-#### Model Registry Immutability Concept
-- **Append-Only Pattern:** Existing database records in `model_record` are immutable and are never updated or deleted in-place.
-- **Version Lineage Tracking:** Every training or model registration produces a distinct version row (for example `v1.0.0`, `v1.1.0`, `v2.0.0`) along with execution metrics (`accuracy`, `loss`).
-- **Auditability and Rollback Safety:** Guarantees 100% auditability and allows seamless rollbacks to previous production model versions.
+The end-to-end data processing workflow covers user authentication, raw dataset storage in MinIO, immutable version registration, asynchronous task execution, and inference.
 
-#### Async Training System Architecture
-- **Non-blocking Execution:** Calls to `POST /api/v1/train` return immediate `202 Accepted` responses containing a unique `job_id`, preventing HTTP request timeouts.
-- **ARQ & Redis Task Worker:** Tasks are enqueued into a Redis Queue. Background ARQ worker processes pull tasks, execute model training on CPU/GPU hardware, stream progress updates, and save trained weights back to MinIO and PostgreSQL.
+#### Mermaid Sequence Diagram
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as Client / User
+    participant Auth as Auth Service (/auth)
+    participant Dataset as Dataset Module (/datasets)
+    participant ModelReg as Model Registry (/models)
+    participant Queue as Redis / ARQ Worker (/train)
+    participant Predict as Inference Engine (/predict)
+    participant MinIO as MinIO Object Storage
+    participant DB as PostgreSQL DB
 
-#### Comprehensive Error Logging System
-- **Structured JSON Logging:** All log output is serialized into standard JSON strings containing `timestamp`, `log_level`, `logger_name`, `message`, and contextual request attributes.
-- **Log Files Location:** Main log files are stored under `logs/backend.log` (FastAPI Gateway logs) and `logs/app.log` (general application runtime logs), alongside `logs/database.log` and `logs/minio.log`.
-- **Traceback and Debugging:** Captures detailed exception stack traces, request execution durations (`duration_ms`), and caller file/line metadata for debugging.
+    User->>Auth: POST /api/v1/auth/login
+    Auth-->>User: 200 OK (Returns JWT Access Token)
+
+    User->>Dataset: POST /api/v1/datasets/upload (Bearer Token + Binary File)
+    Dataset->>MinIO: Store binary payload in raw-datasets bucket
+    Dataset->>DB: Record metadata (file path, bytes, owner)
+    Dataset-->>User: 201 Created (dataset_id)
+
+    User->>ModelReg: POST /api/v1/models/register
+    ModelReg->>DB: Append immutable record (v1.0.0, lineage metrics)
+    ModelReg-->>User: 201 Created (model_id, version)
+
+    User->>Queue: POST /api/v1/train (dataset_id, hyperparams)
+    Queue->>Redis: Enqueue training task
+    Queue-->>User: 202 Accepted (job_id)
+    Note over Queue,MinIO: ARQ Worker fetches raw data, trains model, and saves weights to MinIO
+
+    User->>Predict: POST /api/v1/predict (model_id, input_data)
+    Predict->>MinIO: Fetch model weights (.pt / .onnx)
+    Predict->>Predict: Execute model forward pass
+    Predict-->>User: 200 OK (Prediction Scores & Metrics)
+```
+
+#### ASCII Data Flow Diagram
+```text
+[1. Auth Token]    -> POST /api/v1/auth/login      -> JWT Issued
+[2. Dataset]       -> POST /api/v1/datasets/upload -> MinIO (Binary) + PostgreSQL (Metadata)
+[3. Model Reg]     -> POST /api/v1/models/register -> PostgreSQL (Append-Only v1.0.0 Record)
+[4. Async Train]   -> POST /api/v1/train           -> Redis Queue -> ARQ Worker (Non-blocking 202)
+[5. Inference]     -> POST /api/v1/predict         -> MinIO Weights -> Prediction Result (200 OK)
+```
+
+---
+
+### 2.3 Core Architectural Principles
+
+- **Separation of Concerns & Clean Architecture:** The application strictly separates the UI presentation layer, FastAPI route controllers, business logic services, database ORM models, and data validation schemas.
+- **Dependency Injection & Environment Isolation:** FastAPI dependency injection (`Depends`) enforces authentication context, database session lifecycle management, and runtime environment variable isolation via `.env` and Pydantic settings.
+- **Immutability Pattern for Model Registry:** Model registry entries follow an append-only architecture pattern where records are strictly additive. Previous versions (`v1.0.0`, `v1.1.0`) are preserved indefinitely to guarantee reproducible model lineage and reliable rollback safety.
+- **Non-blocking Asynchronous Task Queue Execution:** High-latency compute jobs (such as ML model training) are offloaded to background ARQ workers via Redis, allowing the API gateway to return immediate asynchronous HTTP `202 Accepted` responses.
+- **Structured JSON System Logging:** Diagnostic logs across gateway, database, storage, and application components are generated in structured JSON format, enabling unified log analysis, tracing, and automated monitoring.
 
 ---
 
