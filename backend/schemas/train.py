@@ -18,3 +18,22 @@ class TrainJobResponse(BaseModel):
     job_id: str
     status: str = "queued"
     message: str
+
+
+class TrainJobStatusResponse(BaseModel):
+    """Training job status check response schema."""
+
+    job_id: str
+    status: str
+    progress: float = 0.0
+    result: Optional[Dict[str, Any]] = None
+    message: Optional[str] = None
+
+
+class TrainJobCancelResponse(BaseModel):
+    """Training job cancellation response schema."""
+
+    job_id: str
+    status: str = "cancelled"
+    message: str
+

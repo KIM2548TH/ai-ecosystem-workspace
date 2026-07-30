@@ -6,16 +6,16 @@ from backend.core.security import get_current_user
 from backend.models.user import UserModel
 from backend.schemas.inference import PredictRequest, PredictResponse
 
-router = APIRouter(prefix="/api/v1/predict", tags=["Inference"])
+router = APIRouter(tags=["Inference"])
 
 
-@router.post("", response_model=PredictResponse)
-@router.post("/", response_model=PredictResponse)
+@router.post("/api/v1/predict", response_model=PredictResponse)
+@router.post("/predict", response_model=PredictResponse)
 def predict(
     request: PredictRequest,
     current_user: UserModel = Depends(get_current_user),
 ):
-    """Perform model inference on input data."""
+    """High-speed low-latency inference endpoint."""
     return PredictResponse(
         prediction={
             "result": "success",

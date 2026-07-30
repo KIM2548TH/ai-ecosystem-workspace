@@ -1,24 +1,30 @@
-"""System Health API router."""
+"""System Health and Monitoring API router."""
 
+import json
+import os
 import urllib.error
 import urllib.request
+from typing import Any, Dict, List, Optional
 
 from arq import create_pool
 from arq.connections import RedisSettings
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy import text
 
 from backend.core.config import settings
+from backend.core.security import get_current_user
 from backend.db.database import SessionLocal
+from backend.models.user import UserModel
 from backend.services.minio_service import MinIOService
 
-router = APIRouter(prefix="/api/v1/health", tags=["System Health"])
+router = APIRouter(tags=["System & Health"])
 
 
-@router.get("")
-@router.get("/")
+@router.get("/api/v1/system/health")
+@router.get("/api/v1/health")
+@router.get("/health")
 async def check_health():
-    """Check health status of PostgreSQL, Redis, MinIO, and Label Studio services."""
+    """System health check for PostgreSQL, MinIO, Redis, Label Studio."""
     services = {}
 
     # Check PostgreSQL health
@@ -57,20 +63,23 @@ async def check_health():
         health_url = f"{base_url}/health"
         try:
             req = urllib.request.Request(health_url, headers={"User-Agent": "BackendHealthCheck"})
-            with urllib.request.urlopen(req, timeout=5) as resp:
+            with urllib.request.urlopen(req, timeout=3) as resp:
                 if resp.status == 200:
                     services["label_studio"] = "healthy"
                 else:
                     services["label_studio"] = f"unhealthy: HTTP status {resp.status}"
         except urllib.error.HTTPError as exc:
-            if exc.code == 404:
+            if exc.code in (200, 404):
                 api_health_url = f"{base_url}/api/health"
-                req_api = urllib.request.Request(api_health_url, headers={"User-Agent": "BackendHealthCheck"})
-                with urllib.request.urlopen(req_api, timeout=5) as resp_api:
-                    if resp_api.status == 200:
-                        services["label_studio"] = "healthy"
-                    else:
-                        services["label_studio"] = f"unhealthy: HTTP status {resp_api.status}"
+                try:
+                    req_api = urllib.request.Request(api_health_url, headers={"User-Agent": "BackendHealthCheck"})
+                    with urllib.request.urlopen(req_api, timeout=3) as resp_api:
+                        if resp_api.status == 200:
+                            services["label_studio"] = "healthy"
+                        else:
+                            services["label_studio"] = f"unhealthy: HTTP status {resp_api.status}"
+                except Exception:
+                    services["label_studio"] = f"unhealthy: HTTP status {exc.code}"
             else:
                 services["label_studio"] = f"unhealthy: HTTP status {exc.code}"
     except Exception as exc:
@@ -83,3 +92,44 @@ async def check_health():
         "services": services,
     }
 
+
+@router.get("/api/v1/system/logs")
+@router.get("/api/v1/logs")
+def get_system_logs(
+    limit: int = Query(100, ge=1, le=1000, description="Maximum number of log entries to return"),
+    log_level: Optional[str] = Query(None, description="Filter logs by severity level (INFO, WARNING, ERROR, DEBUG)"),
+    current_user: UserModel = Depends(get_current_user),
+) -> List[Dict[str, Any]]:
+    """Retrieve structured JSON logs history."""
+    logs = []
+    log_dir = "logs"
+
+    log_files = [
+        os.path.join(log_dir, "backend.log"),
+        os.path.join(log_dir, "app.log"),
+        os.path.join(log_dir, "backend.log.sample"),
+        os.path.join(log_dir, "app.log.sample"),
+    ]
+
+    for log_file in log_files:
+        if os.path.exists(log_file):
+            try:
+                with open(log_file, "r", encoding="utf-8") as f:
+                    for line in f:
+                        line = line.strip()
+                        if not line:
+                            continue
+                        try:
+                            log_entry = json.loads(line)
+                            if log_level:
+                                entry_level = log_entry.get("log_level", "").upper()
+                                if entry_level != log_level.upper():
+                                    continue
+                            logs.append(log_entry)
+                        except json.JSONDecodeError:
+                            continue
+            except Exception:
+                continue
+
+    logs.reverse()
+    return logs[:limit]

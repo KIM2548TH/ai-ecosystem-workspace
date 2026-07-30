@@ -2,7 +2,7 @@
 
 from typing import List
 
-from fastapi import APIRouter, Depends, File, UploadFile, status
+from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile, status
 from sqlalchemy.orm import Session
 
 from backend.core.security import get_current_user
@@ -21,10 +21,10 @@ async def upload_dataset(
     current_user: UserModel = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    """Upload dataset file to MinIO and store metadata record in PostgreSQL."""
+    """Stream raw dataset file to MinIO bucket ('raw-datasets') and record metadata in PostgreSQL."""
     contents = await file.read()
     file_size = len(contents)
-    filename = file.filename
+    filename = file.filename or "unnamed_dataset"
 
     bucket_name = "raw-datasets"
     object_path = f"datasets/{current_user.id}/{filename}"
@@ -54,9 +54,27 @@ async def upload_dataset(
 @router.get("", response_model=List[DatasetResponse])
 @router.get("/", response_model=List[DatasetResponse])
 def get_datasets(
+    skip: int = Query(0, ge=0, description="Number of records to skip"),
+    limit: int = Query(100, ge=1, le=1000, description="Maximum number of records to return"),
     current_user: UserModel = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    """Retrieve list of datasets."""
-    datasets = db.query(DatasetModel).all()
+    """Get all datasets with pagination (skip, limit)."""
+    datasets = db.query(DatasetModel).offset(skip).limit(limit).all()
     return datasets
+
+
+@router.get("/{dataset_id}", response_model=DatasetResponse)
+def get_dataset_by_id(
+    dataset_id: int,
+    current_user: UserModel = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Get single dataset details by ID."""
+    dataset = db.query(DatasetModel).filter(DatasetModel.id == dataset_id).first()
+    if not dataset:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Dataset with ID {dataset_id} not found",
+        )
+    return dataset

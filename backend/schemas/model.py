@@ -11,8 +11,9 @@ class ModelRegisterRequest(BaseModel):
 
     model_name: str
     version: str
-    minio_weight_path: str
+    minio_weight_path: Optional[str] = None
     metrics: Optional[dict] = None
+
 
 
 class ModelRegistryResponse(BaseModel):
