@@ -1,3 +1,5 @@
+ผมไม่พุตของพวกไฟล์ของพวก agent มานะครับในส่วน agent_folder กับไฟล์ .md บางไฟล์
+
 # FastAPI AI Ecosystem & React Web Application
 
 An end-to-end modern AI platform combining a high-performance FastAPI backend microservice architecture with a modern React (Vite) frontend web application. The platform provides secure user authentication, object storage integration with MinIO, dataset metadata management with PostgreSQL 17, an append-only machine learning model registry, asynchronous automated training pipelines backed by Redis and ARQ, and structured JSON system logging.
