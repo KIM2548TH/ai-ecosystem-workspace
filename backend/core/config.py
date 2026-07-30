@@ -1,8 +1,10 @@
 """Configuration settings for the Backend service."""
 
+import json
 from pathlib import Path
+from typing import List, Union
 
-from pydantic import Field
+from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 # Locate .env dynamically (check root first, then backend/)
@@ -30,8 +32,34 @@ class Settings(BaseSettings):
     minio_bucket: str = Field(default="user-profiles")
     minio_api_port: int = Field(default=9000)
     minio_console_port: int = Field(default=9001)
+    secret_key: str = Field(default="super-secret-ai-ecosystem-jwt-key-2026")
+    algorithm: str = Field(default="HS256")
+    access_token_expire_minutes: int = Field(default=60)
+    cors_origins: List[str] = Field(
+        default=[
+            "http://localhost:5173",
+            "http://127.0.0.1:5173",
+            "http://localhost:3000",
+            "http://localhost:8000",
+        ]
+    )
     log_level: str = Field(default="DEBUG")
     log_file: str = Field(default="logs/app.log")
+
+    @field_validator("cors_origins", mode="before")
+    @classmethod
+    def parse_cors_origins(cls, v: Union[str, List[str]]) -> List[str]:
+        if isinstance(v, str):
+            v = v.strip()
+            if not v:
+                return []
+            if v.startswith("[") and v.endswith("]"):
+                try:
+                    return json.loads(v)
+                except Exception:
+                    pass
+            return [origin.strip() for origin in v.split(",") if origin.strip()]
+        return v
 
     model_config = SettingsConfigDict(
         env_file=str(ENV_FILE),
@@ -41,3 +69,4 @@ class Settings(BaseSettings):
 
 
 settings: Settings = Settings()
+

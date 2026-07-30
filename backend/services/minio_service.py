@@ -39,6 +39,23 @@ class MinIOService:
         )
         return res
 
+    def upload_bytes(self, object_name: str, data: bytes, bucket_name: str = None, content_type: str = "application/octet-stream"):
+        import io
+        bucket = bucket_name or self.default_bucket
+        self.ensure_bucket(bucket)
+        res = self.client.put_object(
+            bucket,
+            object_name,
+            io.BytesIO(data),
+            length=len(data),
+            content_type=content_type
+        )
+        logger.info(
+            f"Uploaded bytes to '{bucket}/{object_name}'",
+            extra={"operation": "upload_bytes", "status": "SUCCESS"}
+        )
+        return res
+
     def download_file(self, object_name: str, file_path: str, bucket_name: str = None, version_id: str = None):
         bucket = bucket_name or self.default_bucket
         self.client.fget_object(bucket, object_name, file_path, version_id=version_id)
