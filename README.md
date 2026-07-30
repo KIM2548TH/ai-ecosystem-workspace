@@ -1,6 +1,6 @@
-ผมไม่พุตของพวกไฟล์ของพวก agent มานะครับในส่วน agent_folder กับไฟล์ .md บางไฟล์
+ผมไม่ push ไฟล์งานของ agent มานะครับในส่วนของ agent_folder กับไฟล์ .md บางไฟล์ (ในตอนทำงานเอเจนผมจะใช้โฟลเดอร์พวกนี้ทำงาน)
 
-# 🚀 FastAPI AI Ecosystem Backend Workspaces
+# FastAPI AI Ecosystem Backend Workspaces
 
 ![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi)
 ![Python 3.12+](https://img.shields.io/badge/Python_3.12+-3776AB?style=for-the-badge&logo=python&logoColor=white)
@@ -67,7 +67,7 @@ npm run dev
 
 ---
 
-## 📌 API Specification Table
+## API Specification Table
 
 | โดเมนงาน (Domain) | HTTP Verb | API Endpoint | หน้าที่และการทำงาน (Functionality) |
 | :--- | :---: | :--- | :--- |
