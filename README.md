@@ -216,6 +216,9 @@ ai-ecosystem-workspace/
 │       ├── services/              # S3 MinIO Storage Manager & ARQ Redis Worker Services
 │       ├── models/                # SQLAlchemy Database Entities (User, Dataset, ModelRegistry)
 │       └── utils/                 # Custom JSON Structured Logger & Path Helpers
+│           ├── dir_utils.py       # Directory Structure Management Utilities
+│           ├── logger.py          # Custom Structured JSON Logger
+│           └── logging_utils.py   # Logging & Metric Decorators
 ├── frontend/                       # React Frontend Web Application (Vite)
 │   ├── public/                     # Static Public Web Assets
 │   ├── src/                        # React Source Code
@@ -241,10 +244,6 @@ ai-ecosystem-workspace/
 │   ├── database.log.sample         # Database Log Sample Reference
 │   ├── minio.log                   # MinIO Storage Operation Log
 │   └── minio.log.sample            # MinIO Log Sample Reference
-├── utils/                          # Common Utility Modules
-│   ├── dir_utils.py                # Directory Structure Management Utilities
-│   ├── logger.py                   # Custom Structured JSON Logger
-│   └── logging_utils.py            # Logging & Metric Decorators
 ├── tests/                          # Automated Integration & Unit Tests
 ├── .env.sample                     # Environment Variables Configuration Template
 ├── compose.yml                     # Docker Compose Orchestration (PostgreSQL, Redis, MinIO, Label Studio)
