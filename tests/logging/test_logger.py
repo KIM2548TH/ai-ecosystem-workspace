@@ -1,7 +1,7 @@
 import os, sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
-from utils.logger import get_custom_logger, log_execution, generate_sample_logs
+from backend.app.utils.logger import get_custom_logger, log_execution, generate_sample_logs
 import time
 
 logger = get_custom_logger("TestLogger", "DEBUG")

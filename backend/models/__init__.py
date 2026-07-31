@@ -1,8 +1,5 @@
-"""Models package initialization."""
+"""Legacy shim for models package."""
 
-from backend.db.database import Base
-from backend.models.dataset import DatasetModel
-from backend.models.model_registry import ModelRegistryModel
-from backend.models.user import UserModel
+from backend.app.models import Base, DatasetModel, ModelRegistryModel, UserModel
 
 __all__ = ["Base", "UserModel", "DatasetModel", "ModelRegistryModel"]

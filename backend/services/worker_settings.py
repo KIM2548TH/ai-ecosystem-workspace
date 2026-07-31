@@ -1,34 +1,5 @@
-"""ARQ Worker configuration and background task definitions."""
+"""Legacy shim for worker_settings module."""
 
-import sys
-from pathlib import Path
-from typing import Any, Dict
+from backend.app.services.worker_settings import WorkerSettings, simple_work
 
-# Ensure root directory is in sys.path when running worker directly
-sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
-
-from arq.connections import RedisSettings
-
-from backend.core.config import settings
-
-
-async def simple_work(ctx: Dict[str, Any], data: Dict[str, Any]) -> Dict[str, Any]:
-    """Async background task for ARQ worker queue processing."""
-    print("[Worker] Processing job...")
-    if isinstance(data, dict):
-        for key, val in data.items():
-            print(f"  - {key}: {val}")
-    else:
-        print(f"  - Payload: {data}")
-    return {"status": "done", "data": data}
-
-
-class WorkerSettings:
-    """ARQ Worker configuration settings."""
-
-    functions = [simple_work]
-    redis_settings: RedisSettings = RedisSettings(
-        host=settings.redis_host,
-        port=settings.redis_port,
-    )
-
+__all__ = ["WorkerSettings", "simple_work"]

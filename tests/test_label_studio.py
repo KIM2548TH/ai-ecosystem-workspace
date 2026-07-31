@@ -7,7 +7,7 @@ from typing import Any, List, Optional
 # Ensure root directory is in sys.path when running script directly
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from backend.core.config import settings
+from backend.app.core.config import settings
 
 try:
     from label_studio_sdk.client import LabelStudio

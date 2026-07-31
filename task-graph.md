@@ -1,7 +1,7 @@
-# Task Graph: Disk Cleanup, MinIO Recovery & Label Studio Integration
+# Task Graph: Folder Restructuring to app/ Layout
 
-- [x] Task 1: Clean disk space using docker system prune
-- [x] Task 2: Start MinIO and Label Studio containers via docker-compose
-- [x] Task 3: Verify container statuses (all 4 services Up & Healthy)
-- [x] Task 4: Add Label Studio health check logic in `backend/routes/health.py`
-- [x] Task 5: Empirical verification of `/api/v1/health` endpoint (All services returned "healthy")
+- [x] Task 1: Create `backend/app/` layout (`core`, `routers`, `schemas`, `services`, `models`, `utils`) matching screenshot
+- [x] Task 2: Copy `compose.yml` to `backend/compose.yml`
+- [x] Task 3: Update all Python import statements across `backend/main.py`, `backend/app/**/*.py`, and `tests/`
+- [x] Task 4: Empirical runtime verification (FastAPI server started, `/api/v1/system/health` returned 200 OK with all 4 services healthy)
+- [x] Task 5: Commit and push changes to Git repository

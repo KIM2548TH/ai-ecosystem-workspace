@@ -11,7 +11,7 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.engine import Engine
 from sqlalchemy.exc import OperationalError
 
-from backend.core.config import settings
+from backend.app.core.config import settings
 
 
 class PostgresCRUDTester:

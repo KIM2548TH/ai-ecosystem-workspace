@@ -7,7 +7,7 @@ from pathlib import Path
 # Ensure root directory is in sys.path when running script directly
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from backend.core.config import settings
+from backend.app.core.config import settings
 
 
 def test_settings() -> None:

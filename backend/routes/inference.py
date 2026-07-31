@@ -1,27 +1,5 @@
-"""Inference API router."""
+"""Legacy shim for inference router."""
 
-from fastapi import APIRouter, Depends
+from backend.app.routers.inference import router, predict
 
-from backend.core.security import get_current_user
-from backend.models.user import UserModel
-from backend.schemas.inference import PredictRequest, PredictResponse
-
-router = APIRouter(tags=["Inference"])
-
-
-@router.post("/api/v1/predict", response_model=PredictResponse)
-@router.post("/predict", response_model=PredictResponse)
-def predict(
-    request: PredictRequest,
-    current_user: UserModel = Depends(get_current_user),
-):
-    """High-speed low-latency inference endpoint."""
-    return PredictResponse(
-        prediction={
-            "result": "success",
-            "model_id": request.model_id,
-            "processed_input": request.input_data,
-        },
-        confidence=0.95,
-        model_version="v1.0.0",
-    )
+__all__ = ["router", "predict"]

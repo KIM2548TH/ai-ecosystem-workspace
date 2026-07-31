@@ -7,11 +7,11 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-from backend.core.config import settings
+from backend.app.core.config import settings
 from backend.db.database import Base, engine
-from backend.models import DatasetModel, ModelRegistryModel, UserModel  # noqa: F401
-from backend.routes import auth, datasets, health, inference, models, train
-from utils.logger import logger
+from backend.app.models import DatasetModel, ModelRegistryModel, UserModel  # noqa: F401
+from backend.app.routers import auth, datasets, health, inference, models, train
+from backend.app.utils.logger import logger
 
 app = FastAPI(
     title="FastAPI AI Ecosystem Gateway API",

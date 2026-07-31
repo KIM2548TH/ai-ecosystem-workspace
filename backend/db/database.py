@@ -7,7 +7,7 @@ except ImportError:
     from sqlalchemy.ext.declarative import declarative_base
     from sqlalchemy.orm import sessionmaker
 
-from backend.core.config import settings
+from backend.app.core.config import settings
 
 SQLALCHEMY_DATABASE_URL = (
     f"postgresql://{settings.postgres_user}:{settings.postgres_password}"
