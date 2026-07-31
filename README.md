@@ -205,35 +205,17 @@ sequenceDiagram
 ## 3. Project Directory Structure
 
 ```text
-ai-eco/
-├── backend/                        # FastAPI Backend Application Core
-│   ├── core/                       # Core Configuration & Security Settings
-│   │   ├── config.py               # Pydantic BaseSettings & Environment Configuration
-│   │   └── security.py             # Bcrypt Password Hashing & JWT Token Management
-│   ├── db/                         # Database Connection & Engine Setup
-│   │   └── database.py             # SQLAlchemy Async/Sync Engine & Session Factories
-│   ├── models/                     # SQLAlchemy Database ORM Models
-│   │   ├── dataset.py              # DatasetModel (Metadata tracking for MinIO)
-│   │   ├── model_registry.py       # ModelRegistryModel (Append-Only ML model records)
-│   │   └── user.py                 # UserModel (User authentication & credentials)
-│   ├── routes/                     # FastAPI Router Controllers (Endpoints)
-│   │   ├── auth.py                 # Authentication Routes (/login, /register, /me)
-│   │   ├── datasets.py             # Dataset Management Routes (/upload, /list)
-│   │   ├── health.py               # Health & Diagnostic Check Routes (/health)
-│   │   ├── inference.py            # Model Prediction Engine Routes (/predict)
-│   │   ├── models.py               # Model Registry Routes (/register, /versions)
-│   │   └── train.py                # Asynchronous Training Pipeline Routes (/train)
-│   ├── schemas/                    # Pydantic Schemas & Request/Response Validation
-│   │   ├── auth.py                 # Authentication Payload Schemas
-│   │   ├── dataset.py              # Dataset Payload Schemas
-│   │   ├── inference.py            # Inference Payload Schemas
-│   │   ├── model.py                # Model Registry Payload Schemas
-│   │   └── train.py                # Training Submission & Job Status Schemas
-│   ├── services/                   # Business Logic & External Integrations
-│   │   ├── enqueue_job.py          # ARQ Redis Task Dispatcher
-│   │   ├── minio_service.py        # MinIO SDK Wrapper for Storage Operations
-│   │   └── worker_settings.py      # ARQ Worker Handler Configurations
-│   └── main.py                     # FastAPI Main App Entrypoint & Middleware Setup
+ai-ecosystem-workspace/
+├── backend/
+│   ├── main.py                    # Gateway Entrypoint, Middleware & Router Registrations
+│   ├── compose.yml                # Multi-container Orchestration Config
+│   └── app/
+│       ├── core/                  # App Settings (Pydantic BaseSettings) & Security (Bcrypt/JWT)
+│       ├── routers/               # API Controllers (auth.py, datasets.py, models.py, train.py, health.py, inference.py)
+│       ├── schemas/               # Validation Schemas & Data Transfer Objects (DTOs)
+│       ├── services/              # S3 MinIO Storage Manager & ARQ Redis Worker Services
+│       ├── models/                # SQLAlchemy Database Entities (User, Dataset, ModelRegistry)
+│       └── utils/                 # Custom JSON Structured Logger & Path Helpers
 ├── frontend/                       # React Frontend Web Application (Vite)
 │   ├── public/                     # Static Public Web Assets
 │   ├── src/                        # React Source Code
